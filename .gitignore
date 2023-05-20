@@ -1,0 +1,8 @@
+# Output dirs
+/.build/*
+/.temp/*
+
+# MSVS workspace files
+*.bsc
+*.ncb
+*.pdb
