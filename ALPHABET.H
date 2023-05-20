@@ -18,14 +18,25 @@
 #ifndef __ALPHABET_H
 #define __ALPHABET_H
 
+#undef max
+#include <map>
+
+typedef unsigned short uint16_t;
+
 struct CLetter {
     int height,
         width,
         data   [64][64];
+
+    CLetter();
 };
 
 class CAlphabet {
-    public: CAlphabet (void);
+public:
+    static const int AsciiSize = 0x80;
+    static const int MaxSize = 0xFFFF; // UINT16_MAX
+
+    CAlphabet (int prealloc = AsciiSize);
     bool    bmp_read  (const char*);
     bool    bmp_write (const char*);
     bool    sci_read  (const char*);
@@ -36,7 +47,7 @@ class CAlphabet {
     bool    wfn_write (const char*);
 
     int     line_h;
-    CLetter letter    [128];
+    std::map<uint16_t, CLetter> letters;
 };
 
 extern CAlphabet alphabet;

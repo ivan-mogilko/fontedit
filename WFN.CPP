@@ -31,30 +31,33 @@ bool CAlphabet::wfn_read (const char *filename) {
     for (i=0; wfn_tag[i]; i++)
         if (fgetc (file) != wfn_tag[i]) return false;
 
-    memset (this, 0, sizeof (CAlphabet));
+    *this = CAlphabet();
     i =  fgetc (file);
     i += fgetc (file) * 0x100;
     fseek (file, i, SEEK_SET);
-    for (i=0; i<0x80; i++) {
+    const int letter_count = CAlphabet::AsciiSize;
+    for (i=0; i<letter_count; i++) {
         off[i] =  fgetc (file);
         off[i] += fgetc (file) * 0x100;
     }
 
     line_h = 0;
-    for (i=0; i<0x80; i++) {
+    for (i=0; i<letter_count; i++) {
         fseek (file, off[i], SEEK_SET);
-        letter[i].width  =  fgetc (file);
-        letter[i].width  += fgetc (file) * 0x100;
-        letter[i].height =  fgetc (file);
-        letter[i].height += fgetc (file) * 0x100;
-        if (letter[i].height > line_h) line_h = letter[i].height;
-        for (j=0; j<letter[i].height; j++) {
-            for (k=0; k<(letter[i].width + 7) / 8; k++) {
+        CLetter letter;
+        letter.width  =  fgetc (file);
+        letter.width  += fgetc (file) * 0x100;
+        letter.height =  fgetc (file);
+        letter.height += fgetc (file) * 0x100;
+        if (letter.height > line_h) line_h = letter.height;
+        for (j=0; j<letter.height; j++) {
+            for (k=0; k<(letter.width + 7) / 8; k++) {
                 n = fgetc (file);
                 for (l=0; l<8; l++)
-                    letter[i].data[k * 8 + (7 - l)][j] = (n >> l) & 1;
+                    letter.data[k * 8 + (7 - l)][j] = (n >> l) & 1;
             }
         }
+        letters[i] = letter;
     }
     if (ferror (file)) { fclose (file); return false; }
     fclose (file);
@@ -78,19 +81,22 @@ bool CAlphabet::wfn_write (const char *filename) {
     fputc (0, file);
 
     /* Binary letter data */
-    for (i=0; i<0x80; i++) {
+    const int letter_count = CAlphabet::AsciiSize;
+    for (i=0; i<letter_count; i++) {
         ii = i;
-        //if (i >= 38 && i <= 126) ii = ((i + 89 - 38 - 27) % 89) + 38;
         off[i] = ftell (file);
-        fputc (letter[ii].width  % 0x100, file);
-        fputc (letter[ii].width  / 0x100, file);
-        fputc (letter[ii].height % 0x100, file);
-        fputc (letter[ii].height / 0x100, file);
-        for (j=0; j<letter[ii].height; j++) {
-            for (k=0; k<(letter[ii].width + 7) / 8; k++) {
+        if (letters.count(ii) == 0)
+            continue;
+        const CLetter &letter = letters[ii];
+        fputc (letter.width  % 0x100, file);
+        fputc (letter.width  / 0x100, file);
+        fputc (letter.height % 0x100, file);
+        fputc (letter.height / 0x100, file);
+        for (j=0; j<letter.height; j++) {
+            for (k=0; k<(letter.width + 7) / 8; k++) {
                 n = 0;
                 for (l=0; l<8; l++)
-                    n |= (letter[ii].data[k * 8 + (7 - l)][j] & 1) << l;
+                    n |= (letter.data[k * 8 + (7 - l)][j] & 1) << l;
                 fputc (n, file);
             }
         }
@@ -98,7 +104,7 @@ bool CAlphabet::wfn_write (const char *filename) {
 
     /* Add offsets to file header */
     o2 = ftell (file);
-    for (i=0; i<0x80; i++) {
+    for (i=0; i<letter_count; i++) {
         fputc (off[i] % 0x100, file);
         fputc (off[i] / 0x100, file);
     }

@@ -49,28 +49,30 @@ bool CAlphabet::bmp_read (const char *filename) {
     fread (buf, size, 1, file);
     if (ferror (file)) { fclose (file); return false; }
     fclose (file);
-    memset (this, 0, sizeof (CAlphabet));
+    *this = CAlphabet();
 
     k = x / 0x10;
     l = y / 0x08;
 
     for (i=0; i<0x10; i++) {
         for (j=0; j<0x8; j++) {
+            CLetter letter;
             for (x=0; x<k; x++) {
                 for (y=0; y<l; y++) {
                     s = (buf[(i * k + x + ((0x8 - j) * l - y - 1) * k * 0x10) * 3]) & 0xff;
                     if (s != 0x00 && s != 0xff) {
                         if (y == 0) {
-                            letter[i + 0x10 * j].width  = x;
+                            letter.width  = x;
                             x = k;
                         } else {
-                            letter[i + 0x10 * j].height = y;
+                            letter.height = y;
                         }
                         break;
                     }
-                    letter[i + 0x10 * j].data[x][y] = s ? 1 : 0;
+                    letter.data[x][y] = s ? 1 : 0;
                 }
             }
+            letters[i + 0x10 * j] = letter;
         }
     }
     delete [] buf;
@@ -87,9 +89,13 @@ bool CAlphabet::bmp_write (const char *filename) {
 
     k = 0;
     l = 0;
-    for (i=0; i<0x80; i++) {
-        if (k < letter[i].width)  k = letter[i].width;
-        if (l < letter[i].height) l = letter[i].height;
+    const int letter_count = CAlphabet::AsciiSize;
+    for (i=0; i<letter_count; i++) {
+        if (letters.count(i) == 0)
+            continue;
+        const CLetter &letter = letters[i];
+        if (k < letter.width)  k = letter.width;
+        if (l < letter.height) l = letter.height;
     }
     k += 2; if (k < 8) k = 8;
     l += 2; if (l < 8) l = 8;
@@ -111,22 +117,25 @@ bool CAlphabet::bmp_write (const char *filename) {
     i = 0;                            fwrite (&i, 4, 1, file);
     i = 0;                            fwrite (&i, 4, 1, file);
 
-    buf = new char [k * l * 0x80 * 3];
+    buf = new char [k * l * letter_count * 3];
     if (buf == NULL) return false;
-    memset (buf, 0x99, k * l * 0x80 * 3);
+    memset (buf, 0x99, k * l * letter_count * 3);
 
     for (i=0; i<0x10; i++) {
         for (j=0; j<0x8; j++) {
-            for (x=0; x<k && x<letter[i + 0x10 * j].width; x++) {
-                for (y=0; y<l && y<letter[i + 0x10 * j].height; y++) {
-                    buf[(i * k + x + ((0x8 - j) * l - y - 1) * k * 0x10) * 3]     = letter[i + 0x10 * j].data[x][y] ? 0xff : 0;
-                    buf[(i * k + x + ((0x8 - j) * l - y - 1) * k * 0x10) * 3 + 1] = letter[i + 0x10 * j].data[x][y] ? 0xff : 0;
-                    buf[(i * k + x + ((0x8 - j) * l - y - 1) * k * 0x10) * 3 + 2] = letter[i + 0x10 * j].data[x][y] ? 0xff : 0;
+            if (letters.count(i + 0x10 * j) == 0)
+                continue;
+            const CLetter &letter = letters[i + 0x10 * j];
+            for (x=0; x<k && x<letter.width; x++) {
+                for (y=0; y<l && y<letter.height; y++) {
+                    buf[(i * k + x + ((0x8 - j) * l - y - 1) * k * 0x10) * 3]     = letter.data[x][y] ? 0xff : 0;
+                    buf[(i * k + x + ((0x8 - j) * l - y - 1) * k * 0x10) * 3 + 1] = letter.data[x][y] ? 0xff : 0;
+                    buf[(i * k + x + ((0x8 - j) * l - y - 1) * k * 0x10) * 3 + 2] = letter.data[x][y] ? 0xff : 0;
                 }
             }
         }
     }
-    fwrite (buf, k * l * 0x80 * 3, 1, file);
+    fwrite (buf, k * l * letter_count * 3, 1, file);
 
     if (ferror (file)) { fclose (file); return false; }
     fclose (file);

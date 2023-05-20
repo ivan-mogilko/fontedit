@@ -169,14 +169,18 @@ void CFontEditDlg::DrawLetter (void) {
     CDC *dc;
     int x, y, i, j, k, l, dd = 2;
 
+    const int letter_count = CAlphabet.AsciiSize;
     dc = GetDC ();
     if (dc) {
         if (mode == 0) {
             k = 0;
             l = 0;
-            for (i=0; i<0x80; i++) {
-                if (k < alphabet.letter[i].width)  k = alphabet.letter[i].width;
-                if (l < alphabet.letter[i].height) l = alphabet.letter[i].height;
+            for (i=0; i<letter_count; i++) {
+                if (alphabet.letters.count(i) == 0)
+                    continue;
+                const CLetter &letter = alphabet.letters[i];
+                if (k < letter.width)  k = letter.width;
+                if (l < letter.height) l = letter.height;
             }
             k += 2; if (k < 8) k = 8;
             l += 2; if (l < 8) l = 8;
@@ -195,16 +199,19 @@ void CFontEditDlg::DrawLetter (void) {
 
             for (i=0; i<0x10; i++) {
                 for (j=0; j<0x8; j++) {
-                    for (x=0; x<k && x<alphabet.letter[i + 0x10 * j].width; x++) {
-                        for (y=0; y<l && y<alphabet.letter[i + 0x10 * j].height; y++) {
+                    if (alphabet.letters.count(i + 0x10 * j) == 0)
+                        continue;
+                    const CLetter &letter = alphabet.letters[i + 0x10 * j];
+                    for (x=0; x<k && x<letter.width; x++) {
+                        for (y=0; y<l && y<letter.height; y++) {
                             dc->BitBlt ((i * k + x) * dd + 120, (j * l + y) * dd + 32, dd, dd,
-                                &bdc, alphabet.letter[i + 0x10 * j].data[x][y] ? 16 : 0, 0, SRCCOPY);
+                                &bdc, letter.data[x][y] ? 16 : 0, 0, SRCCOPY);
                         }
                     }
                 }
             }
         } else {
-            ltr = &alphabet.letter[cur_ltr];
+            ltr = &alphabet.letters[cur_ltr]; // FIXME: dangerous
             for (y=0; y<ltr->height; y++) {
                 for (x=0; x<ltr->width; x++) {
                     dc->BitBlt (x * 16 + 184, y * 16 + 32, 16, 16, &bdc, ltr->data[x][y] ? 16 : 0, 0, SRCCOPY);
@@ -224,7 +231,7 @@ void CFontEditDlg::DrawLetter (void) {
 void CFontEditDlg::SetCurLtr (int newltr, bool force) {
     if (cur_ltr == newltr && force == false && mode == 1) return;
     cur_ltr = newltr % 128;
-    ltr     = &alphabet.letter[cur_ltr];
+    ltr     = &alphabet.letters[cur_ltr];
     SetMode               (1);
     sprintf               (buf, "%d", cur_ltr);
     if (GetFocus () != &LetNum)
@@ -262,9 +269,13 @@ void CFontEditDlg::OnLButtonDown (UINT nFlags, CPoint point) {
         if (point.x < 120 || point.y < 32) return;
         k = 0;
         l = 0;
-        for (i=0; i<0x80; i++) {
-            if (k < alphabet.letter[i].width)  k = alphabet.letter[i].width;
-            if (l < alphabet.letter[i].height) l = alphabet.letter[i].height;
+        const int letter_count = CAlphabet::AsciiSize;
+        for (i=0; i<letter_count; i++) {
+            if (alphabet.letters.count(i) == 0)
+                continue;
+            const CLetter &letter = alphabet.letters[i];
+            if (k < letter.width)  k = letter.width;
+            if (l < letter.height) l = letter.height;
         }
         k += 2; if (k < 8) k = 8; if (k <= 32) k *= 2;
         l += 2; if (l < 8) l = 8; if (l <= 32) l *= 2;
@@ -622,8 +633,9 @@ void CFontEditDlg::OnOutline (void) {
             i = MessageBox ("Outline warning", "Warning: outlining changes the entire font and cannot be undone. Proceed?", MB_YESNO);
         if (i != 6) return;
     }
-    for (i=0; i<0x80; i++) {
-        ltr = &alphabet.letter[i];
+    const int letter_count = CAlphabet::AsciiSize;
+    for (i=0; i<letter_count; i++) {
+        ltr = &alphabet.letters[i];
         ltr->height += 2; if (ltr->height >= 64) ltr->height = 64;
         ltr->width  += 2; if (ltr->width  >= 64) ltr->width  = 64;
         for (j=0; j<ltr->width; j++)  ltr->data[j][ltr->height - 1] = 0;
@@ -651,7 +663,7 @@ void CFontEditDlg::OnOutline (void) {
             }
         }
     }
-    ltr = &alphabet.letter[cur_ltr];
+    ltr = &alphabet.letters[cur_ltr];
     memcpy (&undobuf, ltr, sizeof (CLetter));
     RedrawWindow ();
 }
