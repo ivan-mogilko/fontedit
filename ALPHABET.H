@@ -19,6 +19,7 @@
 #define __ALPHABET_H
 
 #undef max
+#undef min
 #include <map>
 
 typedef unsigned short uint16_t;
@@ -33,8 +34,9 @@ struct CLetter {
 
 class CAlphabet {
 public:
-    static const int AsciiSize = 0x80;
-    static const int MaxSize = 0xFFFF; // UINT16_MAX
+    static const int AsciiSize = 0x80; // INT8_MAX + 1
+    static const int AsciiExSize = 0x100; // UINT8_MAX + 1
+    static const int MaxSize = 0x10000; // UINT16_MAX + 1
 
     CAlphabet (int prealloc = AsciiSize);
     bool    bmp_read  (const char*);

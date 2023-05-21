@@ -100,6 +100,7 @@ BOOL CFontEditDlg::OnInitDialog (void) {
         if (i > 0) filename.Delete (0, i + 1);
         DoLoad (s1);
     }
+    cur_ltr = 0;
     return FALSE;
 }
 
@@ -169,7 +170,7 @@ void CFontEditDlg::DrawLetter (void) {
     CDC *dc;
     int x, y, i, j, k, l, dd = 2;
 
-    const int letter_count = CAlphabet.AsciiSize;
+    const int letter_count = CAlphabet::AsciiExSize;
     dc = GetDC ();
     if (dc) {
         if (mode == 0) {
@@ -230,14 +231,20 @@ void CFontEditDlg::DrawLetter (void) {
 
 void CFontEditDlg::SetCurLtr (int newltr, bool force) {
     if (cur_ltr == newltr && force == false && mode == 1) return;
-    cur_ltr = newltr % 128;
+    if (newltr < 0 || newltr >= CAlphabet::MaxSize)
+        return;
+    cur_ltr = newltr;
     ltr     = &alphabet.letters[cur_ltr];
     SetMode               (1);
-    sprintf               (buf, "%d", cur_ltr);
-    if (GetFocus () != &LetNum)
-    LetNum.SetWindowText  (buf);
-    sprintf               (buf, "%c", cur_ltr);
-    LetChar.SetWindowText (buf);
+    if (GetFocus () != &LetNum) {
+        sprintf               (buf, "%d", cur_ltr);
+        LetNum.SetWindowText(buf);
+    }
+    // FIXME: support unicode
+    if (GetFocus () != &LetChar) {
+        sprintf               (buf, "%c", cur_ltr);
+        LetChar.SetWindowText (buf);
+    }
     sprintf               (buf, "%d", ltr->width);
     Width.SetWindowText   (buf);
     sprintf               (buf, "%d", ltr->height);
@@ -269,7 +276,7 @@ void CFontEditDlg::OnLButtonDown (UINT nFlags, CPoint point) {
         if (point.x < 120 || point.y < 32) return;
         k = 0;
         l = 0;
-        const int letter_count = CAlphabet::AsciiSize;
+        const int letter_count = CAlphabet::AsciiExSize;
         for (i=0; i<letter_count; i++) {
             if (alphabet.letters.count(i) == 0)
                 continue;
@@ -335,14 +342,22 @@ void CFontEditDlg::OnLetter (void) {
 }
 
 void CFontEditDlg::OnLetnum (void) {
+    if (GetFocus() != &LetNum)
+        return;
     int n;
     LetNum.GetWindowText (buf, 10);
     n = atoi (buf);
-    if (n > 0 && n <= 127) SetCurLtr (n);
+    if (n >= 0 && n < CAlphabet::MaxSize) {
+        SetCurLtr (n);
+    } else {
+        n = std::max(0, std::min(n, CAlphabet::MaxSize - 1));
+        sprintf(buf, "%d", n);
+        LetNum.SetWindowText(buf);
+    }
 }
 
 void CFontEditDlg::OnSetfocusLetnum (void) {
-        LetNum.SetWindowText ("");      
+    //LetNum.SetWindowText ("");
 }
 
 void CFontEditDlg::OnKillfocusLetnum (void) {
@@ -351,34 +366,50 @@ void CFontEditDlg::OnKillfocusLetnum (void) {
 }
 
 void CFontEditDlg::OnChangeLetchar (void) {
+    if (GetFocus() != &LetChar)
+        return;
+    // FIXME: unicode support
     LetChar.GetWindowText (buf, 10);
     if (buf[0] != 0)
-    SetCurLtr             (buf[0]);
+        SetCurLtr         (buf[0]);
     LetChar.SetSel        (0, 1);
 }
 
 void CFontEditDlg::OnSetfocusLetchar (void) {
-    LetChar.SetWindowText ("");
+    LetChar.SetWindowText(""); // ??
 }
 
 void CFontEditDlg::OnKillfocusLetchar (void) {
+    // FIXME: unicode support
     buf[0] = cur_ltr;
     buf[1] = 0;
     LetChar.SetWindowText (buf);
 }
 
 void CFontEditDlg::OnLetterdown (void) {
+    int new_ltr = cur_ltr - 1;
+    if (new_ltr < 0)
+        new_ltr = CAlphabet::MaxSize - 1;
+    SetCurLtr (new_ltr);
+    /*
     LetChar.GetWindowText (buf, 10);
     buf[0] = (buf[0] + 127) % 128;
     buf[1] = 0;
     LetChar.SetWindowText (buf);
+    */
 }
 
 void CFontEditDlg::OnLetterup (void) {
+    int new_ltr = cur_ltr + 1;
+    if (new_ltr >= CAlphabet::MaxSize)
+        new_ltr = 0;
+    SetCurLtr (new_ltr);
+    /*
     LetChar.GetWindowText (buf, 10);
     buf[0] = (buf[0] + 1) % 128;
     buf[1] = 0;
     LetChar.SetWindowText (buf);
+    */
 }
 
 
@@ -633,7 +664,7 @@ void CFontEditDlg::OnOutline (void) {
             i = MessageBox ("Outline warning", "Warning: outlining changes the entire font and cannot be undone. Proceed?", MB_YESNO);
         if (i != 6) return;
     }
-    const int letter_count = CAlphabet::AsciiSize;
+    const int letter_count = CAlphabet::AsciiExSize;
     for (i=0; i<letter_count; i++) {
         ltr = &alphabet.letters[i];
         ltr->height += 2; if (ltr->height >= 64) ltr->height = 64;

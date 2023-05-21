@@ -369,5 +369,9 @@
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="FontEdit.rc"
+		/>
 	</Globals>
 </VisualStudioProject>
