@@ -35,8 +35,9 @@ bool CAlphabet::ttf_read (const char *filename) {
     dc->SelectObject (f1);
     brush.CreateSolidBrush (0xff0000);
     
-    const int letter_count = CAlphabet::AsciiSize;
+    const int letter_count = CAlphabet::AsciiExSize;
     for (i=0; i<letter_count; i++) {
+        // FIXME: support Unicode
         buf[0] = i;
         buf[1] = 0;
         dc->FillRect (rect, &brush);

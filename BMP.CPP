@@ -89,7 +89,7 @@ bool CAlphabet::bmp_write (const char *filename) {
 
     k = 0;
     l = 0;
-    const int letter_count = CAlphabet::AsciiSize;
+    const int letter_count = CAlphabet::AsciiExSize;
     for (i=0; i<letter_count; i++) {
         if (letters.count(i) == 0)
             continue;
