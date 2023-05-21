@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -27,26 +27,22 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 IDD_FONTEDIT_DIALOG DIALOGEX 0, 0, 288, 126
-STYLE WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU | WS_THICKFRAME
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "Radiant FontEdit"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    EDITTEXT        IDC_LETNUM,44,3,26,12,ES_CENTER | ES_AUTOHSCROLL | 
-                    ES_NUMBER
+    EDITTEXT        IDC_LETNUM,44,3,26,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_LETCHAR,50,19,14,12,ES_CENTER | NOT WS_TABSTOP
-    EDITTEXT        IDC_WIDTH,41,57,21,12,ES_CENTER | ES_AUTOHSCROLL | 
-                    ES_NUMBER | WS_DISABLED
-    EDITTEXT        IDC_HEIGHT,41,74,21,12,ES_CENTER | ES_AUTOHSCROLL | 
-                    ES_NUMBER
+    EDITTEXT        IDC_WIDTH,41,57,21,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    EDITTEXT        IDC_HEIGHT,41,74,21,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "U",IDC_PANUP,15,24,19,10,BS_FLAT | NOT WS_TABSTOP
     PUSHBUTTON      "D",IDC_PANDOWN,15,44,19,10,BS_FLAT | NOT WS_TABSTOP
     PUSHBUTTON      "L",IDC_PANLEFT,5,34,19,10,BS_FLAT | NOT WS_TABSTOP
     PUSHBUTTON      "R",IDC_PANRIGHT,25,34,19,10,BS_FLAT | NOT WS_TABSTOP
     LTEXT           "Width",IDC_STATIC,8,59,22,10
     LTEXT           "Height",IDC_STATIC,8,76,25,10
-    PUSHBUTTON      "Letter",IDC_LETTER,5,3,35,12,NOT WS_TABSTOP
+    DEFPUSHBUTTON   "Letter",IDC_LETTER,5,3,35,12,NOT WS_TABSTOP
     PUSHBUTTON      "Copy",IDC_COPY,5,93,30,12,NOT WS_TABSTOP
     PUSHBUTTON      "Paste",IDC_PASTE,43,93,27,12,NOT WS_TABSTOP
     PUSHBUTTON      "Fill",IDC_CLEAR,5,111,30,12,NOT WS_TABSTOP
@@ -71,7 +67,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_FONTEDIT_DIALOG, DIALOG
     BEGIN
@@ -91,14 +87,14 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-ICN_MAIN                ICON    DISCARDABLE     "Res\\FontEdit.ico"
+ICN_MAIN                ICON                    "Res\\FontEdit.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-IDB_TILE                BITMAP  DISCARDABLE     "res\\tile.bmp"
+IDB_TILE                BITMAP                  "res\\tile.bmp"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -118,18 +114,18 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
@@ -150,7 +146,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -173,18 +168,16 @@ BEGIN
     BEGIN
         BLOCK "000004b0"
         BEGIN
-            VALUE "Comments", "Font editor for SCI and AGS fonts, also supports BMP and TTF imports\0"
-            VALUE "CompanyName", "Crystal Shard\0"
-            VALUE "FileDescription", "Radiant FontEdit\0"
-            VALUE "FileVersion", "v1.2\0"
-            VALUE "InternalName", "FontEdit\0"
-            VALUE "LegalCopyright", "© 2004 Pieter Simoons aka Radiant; released as freeware\0"
-            VALUE "LegalTrademarks", "Radiant is a registered trademark of Pieter Simoons. No, really!\0"
-            VALUE "OriginalFilename", "FontEdit.exe\0"
-            VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "Radiant FontEdit\0"
-            VALUE "ProductVersion", "v1.2\0"
-            VALUE "SpecialBuild", "\0"
+            VALUE "Comments", "Font editor for SCI and AGS fonts, also supports BMP and TTF imports"
+            VALUE "CompanyName", "Crystal Shard"
+            VALUE "FileDescription", "Radiant FontEdit"
+            VALUE "FileVersion", "v1.2"
+            VALUE "InternalName", "FontEdit"
+            VALUE "LegalCopyright", "© 2004 Pieter Simoons aka Radiant; released as freeware"
+            VALUE "LegalTrademarks", "Radiant is a registered trademark of Pieter Simoons. No, really!"
+            VALUE "OriginalFilename", "FontEdit.exe"
+            VALUE "ProductName", "Radiant FontEdit"
+            VALUE "ProductVersion", "v1.2"
         END
     END
     BLOCK "VarFileInfo"
@@ -192,8 +185,6 @@ BEGIN
         VALUE "Translation", 0x0, 1200
     END
 END
-
-#endif    // !_MAC
 
 #endif    // Dutch (Netherlands) resources
 /////////////////////////////////////////////////////////////////////////////
