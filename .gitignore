@@ -3,6 +3,8 @@
 /.temp/*
 
 # MSVS workspace files
+/.vs/*
 *.bsc
 *.ncb
 *.pdb
+*.vcxproj.user
